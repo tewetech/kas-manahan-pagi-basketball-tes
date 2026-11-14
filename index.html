@@ -1,0 +1,1167 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171717">
+  <meta name="description" content="Dashboard transparansi keuangan Kas Manahan Pagi Basketball.">
+  <title>Kas Manahan Pagi Basketball</title>
+  <link id="appFavicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23262626'/%3E%3Ccircle cx='50' cy='50' r='31' fill='none' stroke='%23C6A15B' stroke-width='7'/%3E%3Cpath d='M19 50h62M50 19c-15 17-15 45 0 62M50 19c15 17 15 45 0 62' fill='none' stroke='%23C6A15B' stroke-width='5'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#171717', surface: '#262626', gold: '#C6A15B', champagne: '#E7D7B2',
+            paper: '#FAF7F0', muted: '#C4BBAA', line: '#3A352D'
+          },
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'], serif: ['Georgia', 'serif'] }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root { color-scheme:dark; --ink:#171717; --surface:#262626; --gold:#C6A15B; --champagne:#E7D7B2; --paper:#FAF7F0; --muted:#C4BBAA; --line:#3A352D; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; background:var(--ink); }
+    body { margin:0; min-height:100svh; background:var(--ink); color:var(--paper); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    #app { min-height:100svh; }
+    button, input, select, textarea { font:inherit; }
+    button { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:2px solid var(--champagne); outline-offset:3px; }
+    button:disabled { cursor:wait; opacity:.62; }
+    .gold-text { color:var(--gold); }
+    .serif { font-family:Georgia,"Times New Roman",serif; }
+    .panel { background:var(--surface); border:1px solid var(--line); border-radius:18px; }
+    .panel-soft { background:#211F1C; border:1px solid #383229; border-radius:16px; }
+    .eyebrow { color:var(--gold); font-size:10px; letter-spacing:.22em; font-weight:800; text-transform:uppercase; }
+    .btn-primary, .btn-secondary, .btn-quiet, .btn-danger { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:42px; border-radius:12px; padding:10px 15px; font-weight:750; line-height:1.2; text-align:center; cursor:pointer; white-space:normal; transition:opacity .16s ease,background-color .16s ease,border-color .16s ease; }
+    .btn-primary { background:var(--gold); color:#17140F; font-weight:800; }
+    .btn-secondary { border:1px solid #655638; background:#302B23; color:var(--champagne); }
+    .btn-quiet { border:1px solid var(--line); background:#222; color:var(--muted); }
+    .btn-danger { border:1px solid #75413A; background:#351F1C; color:#F2BDB3; }
+    .btn-primary:disabled, .btn-secondary:disabled, .btn-quiet:disabled, .btn-danger:disabled { opacity:.62; }
+    .icon-only { width:44px; min-width:44px; min-height:44px; height:44px; padding:0; gap:0; flex:none; }
+    .icon-only svg { width:19px; height:19px; display:block; }
+    .nav-tab { display:inline-flex; align-items:center; justify-content:center; min-width:48px; min-height:42px; color:var(--muted); border:1px solid transparent; border-radius:10px; padding:9px 12px; font-size:13px; font-weight:750; white-space:nowrap; flex:1 0 48px; }
+    .nav-tab svg { width:19px; height:19px; }
+    .nav-tab.active { color:var(--champagne); background:#332D22; border-color:#665638; }
+    .modal-close { display:grid; place-items:center; width:40px; height:40px; border:1px solid transparent; border-radius:10px; color:var(--muted); background:transparent; }
+    .field { width:100%; background:#191919; border:1px solid #494136; border-radius:11px; color:var(--paper); padding:12px 13px; min-height:45px; }
+    .field::placeholder { color:#8C8478; }
+    .field:focus { border-color:var(--gold); outline:none; }
+    .field-label { display:block; color:var(--muted); font-size:12px; font-weight:700; margin:0 0 7px; }
+    .stat-card { min-height:112px; }
+    .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .divider { border-color:var(--line); }
+    .toast { position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translate3d(-50%,12px,0); opacity:0; pointer-events:none; z-index:110; transition:opacity .18s ease,transform .18s ease; width:max-content; max-width:calc(100vw - 32px); overflow-wrap:anywhere; }
+    .toast.show { opacity:1; transform:translate3d(-50%,0,0); }
+    .modal-backdrop { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; background:rgba(0,0,0,.78); padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom)); z-index:60; }
+    .modal-backdrop[hidden] { display:none; }
+    #confirmModal { z-index:90; }
+    .modal-card { width:100%; max-width:440px; max-height:calc(100dvh - 36px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+    .modal-card-wide { max-width:560px; }
+    .hidden-view { display:none !important; }
+    .transaction-row:last-child { border-bottom:0; }
+    .money-number { font-variant-numeric:tabular-nums; letter-spacing:-.035em; }
+    .safe-bottom { padding-bottom:calc(24px + env(safe-area-inset-bottom)); }
+    .brand-mark { width:40px; height:40px; flex:none; border:1px solid #665638; border-radius:13px; display:grid; place-items:center; background:#302B23; overflow:hidden; }
+    .brand-mark img { width:100%; height:100%; object-fit:cover; }
+    .muted-scroll { scrollbar-width:thin; scrollbar-color:#62543A transparent; }
+    .transactions-scroll { max-height:min(54svh,480px); min-height:120px; overflow-y:auto; overflow-x:hidden; overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:#62543A transparent; touch-action:pan-y; }
+    .date-group-heading { background:#211F1C; border-top:1px solid #494136; border-bottom:1px solid #383229; }
+    .date-group-heading:first-child { border-top:0; }
+    .button-spinner { width:18px; height:18px; flex:none; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:button-spin .7s linear infinite; }
+    @keyframes button-spin { to { transform:rotate(360deg); } }
+    @media (hover:hover) and (pointer:fine) {
+      .btn-primary:hover { opacity:.9; }
+      .btn-secondary:hover, .btn-quiet:hover, .btn-danger:hover { border-color:var(--gold); }
+      .modal-close:hover { color:var(--paper); background:#302B23; }
+    }
+    @media (max-width:639px) {
+      .transactions-scroll { max-height:min(52svh,440px); }
+      .transactions-scroll:focus-visible { outline-offset:-2px; }
+      .modal-backdrop { align-items:flex-start; padding-top:max(12px,env(safe-area-inset-top)); padding-bottom:max(12px,env(safe-area-inset-bottom)); }
+      .modal-card { max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+      .transaction-row { column-gap:10px; row-gap:7px; padding-top:15px; padding-bottom:15px; }
+      .transaction-row .transaction-date { grid-column:1 / -1; grid-row:1; font-size:11px; }
+      .transaction-row .transaction-detail { grid-column:1; grid-row:2; }
+      .transaction-row .transaction-kind { grid-column:1; grid-row:3; justify-self:start; }
+      .transaction-row .transaction-amount { grid-column:2; grid-row:2; align-self:center; max-width:100%; white-space:nowrap; font-size:13px; }
+    }
+    @media (min-width:640px) {
+      .transaction-row .transaction-date { grid-column:1; grid-row:1; }
+      .transaction-row .transaction-detail { grid-column:2; grid-row:1; }
+      .transaction-row .transaction-kind { grid-column:3; grid-row:1; }
+      .transaction-row .transaction-amount { grid-column:4; grid-row:1; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *, *::before, *::after { scroll-behavior:auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; }
+      .button-spinner { animation:none; border-right-color:currentColor; }
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden">
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-7 7 7 7M7 12h14"/></symbol>
+    <symbol id="icon-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></symbol>
+    <symbol id="icon-layout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Z"/><path d="M8 8h8M8 12h8M8 16h4"/></symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="m19.4 15 .1.1 1.1.8-1 1.8-1.3-.5a8 8 0 0 1-1.5.9l-.2 1.4h-2.1l-.3-1.4a8 8 0 0 1-1.7 0l-.3 1.4h-2.1l-.2-1.4a8 8 0 0 1-1.5-.9l-1.3.5-1-1.8 1.1-.8a8 8 0 0 1-.3-1.7l-1.2-.7.7-2 1.4.1a8 8 0 0 1 1.2-1.2L8.8 6l2-.7.7 1.2a8 8 0 0 1 1.7 0l.7-1.2 2 .7-.1 1.4a8 8 0 0 1 1.2 1.2l1.4-.1.7 2-1.2.7a8 8 0 0 1-.5 1.8Z"/></symbol>
+    <symbol id="icon-database" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icon-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 16.5-.8 4.3 4.3-.8L19 8.5 15.5 5 4 16.5Z"/><path d="m13.8 6.7 3.5 3.5M4 20.8h16"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 14h12l1-14M9 7V4h6v3"/></symbol>
+    <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h12l4 4v14H3V3h2Z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m18 6-12 12M6 6l12 12"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></symbol>
+    <symbol id="icon-user-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+    <symbol id="icon-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M6 13l6 6 6-6"/></symbol>
+  </svg>
+  <div id="app" class="min-h-screen">
+    <header class="border-b border-line/80">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+        <a href="#top" class="flex items-center gap-3 min-w-0" aria-label="Beranda">
+          <span id="brandMark" class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="27" height="27" fill="none"><circle cx="24" cy="24" r="17" stroke="#C6A15B" stroke-width="2.5"/><path d="M7 24h34M24 7c-8 9-8 25 0 34M24 7c8 9 8 25 0 34" stroke="#C6A15B" stroke-width="2"/></svg>
+          </span>
+          <span class="min-w-0">
+            <span id="brandName" class="block text-sm sm:text-base font-extrabold tracking-tight text-paper truncate">Kas Manahan Pagi Basketball</span>
+            <span class="block text-[10px] tracking-[.19em] uppercase text-muted mt-0.5">Financial Overview</span>
+          </span>
+        </a>
+        <button id="openLoginBtn" class="btn-secondary icon-only" type="button" aria-label="Masuk admin" title="Masuk admin"><svg><use href="#icon-shield"></use></svg></button>
+      </div>
+    </header>
+
+    <main id="publicView" class="max-w-6xl mx-auto px-4 sm:px-6">
+      <section id="top" class="pt-10 sm:pt-16 pb-8 sm:pb-12 grid lg:grid-cols-[1.08fr_.92fr] gap-8 lg:gap-12 items-center">
+        <div>
+          <p class="eyebrow mb-4">Manahan Pagi • Basketball Community</p>
+          <h1 class="serif text-[2.55rem] sm:text-5xl lg:text-[3.6rem] leading-[1.08] tracking-[-.045em] max-w-2xl">Kebersamaan yang kuat, <span class="italic gold-text">KAS</span> terpercaya.</h1>
+          <p id="publicTagline" class="text-muted text-sm sm:text-base leading-7 mt-5 max-w-xl">Satu tim, satu tujuan, transparansi untuk semua.</p>
+          <div class="flex flex-wrap items-center gap-3 mt-7">
+            <a href="#transaksi" class="btn-primary icon-only" aria-label="Lihat arus kas" title="Lihat arus kas"><svg><use href="#icon-arrow-down"></use></svg></a>
+            <span class="text-xs text-muted inline-flex items-center gap-2"><span class="dot bg-gold"></span> Data kas diperbarui berkala</span>
+          </div>
+        </div>
+        <div class="panel p-5 sm:p-7 relative overflow-hidden">
+          <div class="absolute -right-12 -top-14 w-48 h-48 rounded-full border border-[#76603A]/30"></div>
+          <div class="absolute -right-5 -top-7 w-32 h-32 rounded-full border border-[#76603A]/25"></div>
+          <div class="relative">
+            <div class="flex items-center justify-between gap-3">
+              <p class="eyebrow">Saldo kas saat ini</p>
+              <span class="text-[10px] uppercase tracking-widest text-muted border border-line rounded-full px-3 py-1">Live summary</span>
+            </div>
+            <p id="publicBalance" class="money-number text-[2.05rem] sm:text-4xl font-semibold mt-4">Rp0</p>
+            <p class="text-xs text-muted mt-2">Saldo awal + seluruh pemasukan − pengeluaran</p>
+            <div class="grid grid-cols-2 gap-3 mt-7">
+              <div class="panel-soft p-4">
+                <div class="flex items-center gap-2 text-xs text-muted"><span class="dot bg-[#7AAB83]"></span> Pemasukan bulan ini</div>
+                <p id="publicMonthIncome" class="money-number text-lg font-bold text-[#A9D1AF] mt-3">Rp0</p>
+              </div>
+              <div class="panel-soft p-4">
+                <div class="flex items-center gap-2 text-xs text-muted"><span class="dot bg-[#C78D80]"></span> Pengeluaran bulan ini</div>
+                <p id="publicMonthExpense" class="money-number text-lg font-bold text-[#E2B1A6] mt-3">Rp0</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center gap-3 mt-5 pt-4 border-t divider text-xs">
+              <span class="text-muted">Total pemasukan</span><strong id="publicIncomeTotal" class="text-paper money-number">Rp0</strong>
+            </div>
+            <div class="flex justify-between items-center gap-3 mt-2 text-xs">
+              <span class="text-muted">Total pengeluaran</span><strong id="publicExpenseTotal" class="text-paper money-number">Rp0</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="transaksi" class="pb-14 sm:pb-20">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
+          <div>
+            <p class="eyebrow mb-2">Transparansi keuangan</p>
+            <h2 class="serif text-2xl sm:text-3xl">Arus kas terkini</h2>
+            <p class="text-xs text-muted mt-2">Ringkasan transaksi kas yang tercatat.</p>
+          </div>
+          <div class="w-full sm:max-w-2xl grid grid-cols-1 sm:grid-cols-[minmax(180px,1fr)_auto_auto] gap-2">
+            <input id="publicTransactionSearch" type="search" class="field !min-h-0 !py-2.5 text-xs" placeholder="Cari transaksi..." aria-label="Cari transaksi publik" autocomplete="off" enterkeyhint="search">
+            <select id="publicFilter" class="field !w-full sm:!w-auto !min-h-0 !py-2 text-xs" aria-label="Filter jenis transaksi">
+              <option value="all">Semua transaksi</option><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option>
+            </select>
+            <select id="publicGroupMode" class="field !w-full sm:!w-auto !min-h-0 !py-2 text-xs" aria-label="Pratinjau pengelompokan transaksi">
+              <option value="list">Urutan biasa</option><option value="date">Kelompok tanggal</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel overflow-hidden">
+          <div class="hidden sm:grid grid-cols-[1fr_1.2fr_1fr_1fr] gap-4 px-5 py-3 border-b divider text-[10px] uppercase tracking-[.16em] text-muted font-bold">
+            <span>Tanggal</span><span>Detail transaksi</span><span>Jenis</span><span class="text-right">Nominal</span>
+          </div>
+          <div id="publicTransactions" class="px-4 sm:px-5 transactions-scroll" role="region" aria-label="Daftar transaksi publik" tabindex="0">
+            <div class="py-10 text-center text-muted text-sm">Memuat transaksi…</div>
+          </div>
+          <div id="publicEmpty" class="hidden-view px-5 py-10 text-center">
+            <p class="serif text-xl text-paper" id="publicEmptyTitle">Belum ada transaksi</p><p class="text-xs text-muted mt-2" id="publicEmptyDescription">Data transaksi akan tampil di sini setelah dicatat pengurus.</p>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row justify-between gap-3 mt-4 text-[11px] text-muted">
+          <p><span id="publicTransactionCount">0 transaksi</span><span class="mx-2">·</span><span id="lastUpdated">Memuat pembaruan data…</span></p>
+          <p id="paymentNote" class="sm:text-right max-w-xl"></p>
+        </div>
+      </section>
+
+      <footer class="border-t border-line py-6 flex flex-col sm:flex-row justify-between gap-2 text-[11px] text-muted safe-bottom">
+        <span id="footerName">Kas Manahan Pagi Basketball</span><span>Built for team transparency · <span class="gold-text">BOC Manahan Pagi Basketball</span></span>
+      </footer>
+    </main>
+
+    <main id="adminView" class="hidden-view max-w-6xl mx-auto px-4 sm:px-6 pt-7 pb-16 safe-bottom">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <p class="eyebrow mb-2">Control room</p>
+          <h1 class="serif text-3xl sm:text-4xl">Dashboard admin</h1>
+          <p class="text-xs text-muted mt-2">Kelola transaksi, anggota, dan pengaturan kas.</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="backPublicBtn" class="btn-quiet icon-only" type="button" aria-label="Halaman publik" title="Halaman publik"><svg><use href="#icon-arrow-left"></use></svg></button>
+          <button id="logoutBtn" class="btn-secondary icon-only" type="button" aria-label="Keluar admin" title="Keluar admin"><svg><use href="#icon-log-out"></use></svg></button>
+        </div>
+      </div>
+
+      <nav class="flex gap-1 p-1 rounded-xl border border-line bg-[#1D1D1D] overflow-x-auto muted-scroll mb-6" aria-label="Navigasi admin">
+        <button class="nav-tab active" data-admin-tab="overview" type="button" aria-label="Ringkasan" title="Ringkasan"><svg><use href="#icon-layout"></use></svg></button>
+        <button class="nav-tab" data-admin-tab="transactions" type="button" aria-label="Transaksi" title="Transaksi"><svg><use href="#icon-receipt"></use></svg></button>
+        <button class="nav-tab" data-admin-tab="members" type="button" aria-label="Anggota" title="Anggota"><svg><use href="#icon-users"></use></svg></button>
+        <button class="nav-tab" data-admin-tab="settings" type="button" aria-label="Pengaturan" title="Pengaturan"><svg><use href="#icon-settings"></use></svg></button>
+        <button class="nav-tab" data-admin-tab="backup" type="button" aria-label="Backup dan reset" title="Backup dan reset"><svg><use href="#icon-database"></use></svg></button>
+      </nav>
+
+      <section id="adminOverview" class="admin-panel">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          <div class="panel p-5 stat-card"><p class="text-xs text-muted">Saldo kas</p><p id="adminBalance" class="money-number text-2xl font-bold mt-3">Rp0</p><p class="text-[10px] text-muted mt-2">Termasuk saldo awal</p></div>
+          <div class="panel p-5 stat-card"><p class="text-xs text-muted">Pemasukan keseluruhan</p><p id="adminIncome" class="money-number text-2xl font-bold text-[#A9D1AF] mt-3">Rp0</p><p class="text-[10px] text-muted mt-2">Semua periode</p></div>
+          <div class="panel p-5 stat-card"><p class="text-xs text-muted">Pengeluaran keseluruhan</p><p id="adminExpense" class="money-number text-2xl font-bold text-[#E2B1A6] mt-3">Rp0</p><p class="text-[10px] text-muted mt-2">Semua periode</p></div>
+        </div>
+        <div class="grid lg:grid-cols-[1.15fr_.85fr] gap-4">
+          <div class="panel p-5">
+            <div class="flex justify-between items-center gap-3 mb-4"><div><p class="eyebrow mb-1">Aktivitas terbaru</p><h2 class="serif text-xl">Transaksi terakhir</h2></div><button class="btn-quiet icon-only" type="button" data-go-tab="transactions" aria-label="Kelola transaksi" title="Kelola transaksi"><svg><use href="#icon-receipt"></use></svg></button></div>
+            <div id="adminRecentTransactions"></div>
+          </div>
+          <div class="panel p-5">
+            <p class="eyebrow mb-1">Bulan berjalan</p><h2 class="serif text-xl mb-4">Ringkasan bulan ini</h2>
+            <div class="flex justify-between text-sm py-3 border-b divider"><span class="text-muted">Pemasukan</span><strong id="adminMonthIncome" class="text-[#A9D1AF]">Rp0</strong></div>
+            <div class="flex justify-between text-sm py-3 border-b divider"><span class="text-muted">Pengeluaran</span><strong id="adminMonthExpense" class="text-[#E2B1A6]">Rp0</strong></div>
+            <div class="flex justify-between text-sm py-3"><span class="text-muted">Jumlah transaksi</span><strong id="adminTransactionCount">0</strong></div>
+            <button id="quickAddTransactionBtn" class="btn-primary icon-only w-full mt-3" type="button" aria-label="Catat transaksi" title="Catat transaksi"><svg><use href="#icon-plus"></use></svg></button>
+          </div>
+        </div>
+      </section>
+
+      <section id="adminTransactions" class="admin-panel hidden-view">
+        <div class="panel p-5 min-w-0">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div><p class="eyebrow mb-1">Ledger</p><h2 class="serif text-xl">Daftar transaksi</h2><p id="adminLedgerTransactionCount" class="text-[10px] text-muted mt-1">0 transaksi</p></div>
+            <button id="openTransactionModalBtn" class="btn-primary icon-only" type="button" aria-label="Tambah transaksi" title="Tambah transaksi"><svg><use href="#icon-plus"></use></svg></button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-[minmax(160px,1fr)_auto_auto] gap-2 mb-4">
+            <input id="adminTransactionSearch" type="search" class="field !min-h-0 !py-2.5 text-xs" placeholder="Cari keterangan, kategori, anggota..." aria-label="Cari transaksi ledger" autocomplete="off" enterkeyhint="search">
+            <select id="adminTransactionFilter" class="field !w-full sm:!w-auto !min-h-0 !py-2 text-xs" aria-label="Filter jenis transaksi"><option value="all">Semua jenis</option><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option></select>
+            <select id="adminTransactionGroupMode" class="field !w-full sm:!w-auto !min-h-0 !py-2 text-xs" aria-label="Pratinjau pengelompokan ledger"><option value="list">Urutan biasa</option><option value="date">Kelompok tanggal</option></select>
+          </div>
+          <div id="adminTransactionList" class="transactions-scroll" role="region" aria-label="Ledger transaksi" tabindex="0"></div>
+        </div>
+      </section>
+
+      <section id="adminMembers" class="admin-panel hidden-view">
+        <div class="panel p-5">
+          <div class="flex items-center justify-between gap-3 mb-4"><div><p class="eyebrow mb-1">Data anggota</p><h2 class="serif text-xl">Roster Manahan Pagi</h2></div><button id="openMemberModalBtn" class="btn-primary icon-only" type="button" aria-label="Tambah anggota" title="Tambah anggota"><svg><use href="#icon-user-plus"></use></svg></button></div>
+          <div id="memberList" class="divide-y divide-line"></div>
+        </div>
+      </section>
+
+      <section id="adminSettings" class="admin-panel hidden-view">
+        <div class="grid lg:grid-cols-2 gap-4 items-start">
+          <div class="panel p-5">
+            <p class="eyebrow mb-1">Identitas & tampilan</p><h2 class="serif text-xl mb-2">Pengaturan website</h2>
+            <p class="text-xs text-muted leading-5 mb-5">Atur nama website, tampilan, saldo awal, dan informasi pembayaran.</p>
+            <button id="openSettingsModalBtn" class="btn-secondary icon-only" type="button" aria-label="Edit pengaturan website" title="Edit pengaturan website"><svg><use href="#icon-pencil"></use></svg></button>
+          </div>
+          <div class="panel p-5">
+            <p class="eyebrow mb-1">Keamanan</p><h2 class="serif text-xl mb-2">Akun admin</h2><p class="text-xs leading-5 text-muted mb-5">Perbarui username dan password untuk mengamankan dashboard. Perubahan akan mengakhiri sesi admin yang sedang aktif.</p>
+            <button id="openAccountModalBtn" class="btn-secondary icon-only" type="button" aria-label="Edit akun admin" title="Edit akun admin"><svg><use href="#icon-lock"></use></svg></button>
+            <div class="mt-6 pt-5 border-t divider"><p class="text-xs text-muted leading-5">Password disimpan sebagai hash di server dan tidak dikirim kembali ke browser. Gunakan password yang kuat dan berbeda dari akun lain.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="adminBackup" class="admin-panel hidden-view">
+        <div class="grid lg:grid-cols-2 gap-4 items-start">
+          <div class="panel p-5">
+            <p class="eyebrow mb-1">Keamanan data</p><h2 class="serif text-xl">Backup data</h2><p class="text-xs text-muted leading-5 mt-2 mb-5">Unduh salinan JSON berisi transaksi, anggota, kategori, dan pengaturan website.</p>
+            <button id="downloadBackupBtn" class="btn-primary icon-only" type="button" aria-label="Unduh backup JSON" title="Unduh backup JSON"><svg><use href="#icon-download"></use></svg></button>
+          </div>
+          <div class="panel p-5">
+            <p class="eyebrow mb-1">Pemulihan</p><h2 class="serif text-xl">Restore data</h2><p class="text-xs text-muted leading-5 mt-2 mb-4">Impor file backup JSON dari website ini. Data yang ada akan digantikan oleh data backup.</p>
+            <input id="restoreFile" type="file" accept="application/json,.json" class="field text-xs mb-3">
+            <button id="restoreBackupBtn" class="btn-secondary icon-only" type="button" aria-label="Pulihkan dari file" title="Pulihkan dari file"><svg><use href="#icon-upload"></use></svg></button>
+          </div>
+          <div class="panel p-5 lg:col-span-2 border-[#75413A]"><p class="eyebrow !text-[#D49A8C] mb-1">Aksi permanen</p><h2 class="serif text-xl">Reset seluruh data kas</h2><p class="text-xs text-muted leading-5 mt-2 mb-4">Menghapus transaksi, anggota, dan pengaturan kustom lalu mengembalikan data awal. Kredensial admin tidak ikut direset.</p><button id="resetDataBtn" class="btn-danger icon-only" type="button" aria-label="Reset data sekarang" title="Reset data sekarang"><svg><use href="#icon-refresh"></use></svg></button></div>
+        </div>
+      </section>
+
+      <p id="adminUpdatedAt" class="text-[11px] text-muted mt-6"></p>
+    </main>
+  </div>
+
+  <div id="transactionEditorModal" class="modal-backdrop" hidden>
+    <div class="panel modal-card modal-card-wide p-5 sm:p-6 relative" role="dialog" aria-modal="true" aria-labelledby="transactionFormTitle">
+      <button id="closeTransactionModalBtn" class="modal-close absolute top-3 right-3" type="button" aria-label="Tutup editor transaksi" title="Tutup"><svg width="19" height="19"><use href="#icon-x"></use></svg></button>
+      <p class="eyebrow mb-1">Input data</p><h2 id="transactionFormTitle" class="serif text-xl mb-5 pr-10">Tambah transaksi</h2>
+      <form id="transactionForm" class="space-y-4">
+        <input type="hidden" id="transactionId">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="field-label" for="transactionType">Jenis</label><select id="transactionType" class="field" required><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option></select></div>
+          <div><label class="field-label" for="transactionDate">Tanggal</label><input id="transactionDate" type="date" class="field" required></div>
+        </div>
+        <div><label class="field-label" for="transactionAmount">Nominal (Rp)</label><input id="transactionAmount" type="text" inputmode="numeric" autocomplete="off" maxlength="17" class="field" placeholder="Contoh: 50.000" aria-describedby="transactionAmountHint" required><p id="transactionAmountHint" class="text-[10px] text-muted mt-1">Angka akan otomatis menggunakan pemisah ribuan.</p></div>
+        <div><label class="field-label" for="transactionCategory">Kategori</label><select id="transactionCategory" class="field" required></select></div>
+        <div><label class="field-label" for="transactionDescription">Keterangan</label><input id="transactionDescription" type="text" class="field" maxlength="180" placeholder="Contoh: Iuran latihan November" required></div>
+        <div><label class="field-label" for="transactionPerson">Nama anggota / pihak (opsional)</label><input id="transactionPerson" type="text" class="field" maxlength="80" placeholder="Nama penyetor atau penerima"></div>
+        <div><label class="field-label" for="transactionNote">Catatan internal (opsional)</label><textarea id="transactionNote" class="field min-h-[78px]" maxlength="500" placeholder="Catatan untuk pengurus"></textarea></div>
+        <div class="flex gap-2"><button id="saveTransactionBtn" class="btn-primary icon-only flex-1" type="submit" aria-label="Simpan transaksi" title="Simpan transaksi"><svg><use href="#icon-save"></use></svg></button><button id="cancelEditBtn" class="btn-quiet icon-only hidden-view" type="button" aria-label="Batalkan edit transaksi" title="Batalkan edit transaksi"><svg><use href="#icon-x"></use></svg></button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="memberEditorModal" class="modal-backdrop" hidden>
+    <div class="panel modal-card p-5 sm:p-6 relative" role="dialog" aria-modal="true" aria-labelledby="memberFormTitle">
+      <button id="closeMemberModalBtn" class="modal-close absolute top-3 right-3" type="button" aria-label="Tutup editor anggota" title="Tutup"><svg width="19" height="19"><use href="#icon-x"></use></svg></button>
+      <p class="eyebrow mb-1">Roster tim</p><h2 id="memberFormTitle" class="serif text-xl mb-5 pr-10">Tambah anggota</h2>
+      <form id="memberForm" class="space-y-4">
+        <input type="hidden" id="memberId">
+        <div><label class="field-label" for="memberName">Nama anggota</label><input id="memberName" class="field" maxlength="80" required placeholder="Nama lengkap"></div>
+        <div><label class="field-label" for="memberRole">Peran (opsional)</label><input id="memberRole" class="field" maxlength="80" placeholder="Contoh: Pemain / Pengurus"></div>
+        <div><label class="field-label" for="memberNote">Catatan (opsional)</label><textarea id="memberNote" class="field min-h-[76px]" maxlength="300"></textarea></div>
+        <label class="flex gap-2 items-center text-sm text-muted"><input id="memberActive" type="checkbox" checked class="accent-[#C6A15B]"> Anggota aktif</label>
+        <div class="flex gap-2"><button id="saveMemberBtn" class="btn-primary icon-only flex-1" type="submit" aria-label="Simpan anggota" title="Simpan anggota"><svg><use href="#icon-save"></use></svg></button><button id="cancelMemberEditBtn" class="btn-quiet icon-only hidden-view" type="button" aria-label="Batalkan edit anggota" title="Batalkan edit anggota"><svg><use href="#icon-x"></use></svg></button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="settingsEditorModal" class="modal-backdrop" hidden>
+    <div class="panel modal-card modal-card-wide p-5 sm:p-6 relative" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+      <button id="closeSettingsModalBtn" class="modal-close absolute top-3 right-3" type="button" aria-label="Tutup pengaturan" title="Tutup"><svg width="19" height="19"><use href="#icon-x"></use></svg></button>
+      <p class="eyebrow mb-1">Identitas & tampilan</p><h2 id="settingsModalTitle" class="serif text-xl mb-5 pr-10">Pengaturan website</h2>
+      <form id="settingsForm" class="space-y-4">
+        <div><label class="field-label" for="settingSiteName">Nama website</label><input id="settingSiteName" class="field" maxlength="80" required></div>
+        <div><label class="field-label" for="settingTagline">Tagline</label><input id="settingTagline" class="field" maxlength="160"></div>
+        <div><label class="field-label" for="settingOpeningBalance">Saldo awal (Rp)</label><input id="settingOpeningBalance" type="text" inputmode="numeric" autocomplete="off" maxlength="17" class="field" required placeholder="0"></div>
+        <div><label class="field-label" for="settingLogoUrl">URL logo (opsional)</label><input id="settingLogoUrl" type="url" class="field" placeholder="https://..."></div>
+        <div><label class="field-label" for="settingFaviconUrl">URL favicon (opsional)</label><input id="settingFaviconUrl" type="url" class="field" placeholder="https://..."></div>
+        <div><label class="field-label" for="settingPaymentNote">Catatan publik / informasi pembayaran</label><textarea id="settingPaymentNote" class="field min-h-[90px]" maxlength="1000"></textarea></div>
+        <button id="saveSettingsBtn" class="btn-primary icon-only w-full" type="submit" aria-label="Simpan pengaturan" title="Simpan pengaturan"><svg><use href="#icon-save"></use></svg></button>
+      </form>
+    </div>
+  </div>
+
+  <div id="accountEditorModal" class="modal-backdrop" hidden>
+    <div class="panel modal-card p-5 sm:p-6 relative" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+      <button id="closeAccountModalBtn" class="modal-close absolute top-3 right-3" type="button" aria-label="Tutup akun admin" title="Tutup"><svg width="19" height="19"><use href="#icon-x"></use></svg></button>
+      <p class="eyebrow mb-1">Keamanan</p><h2 id="accountModalTitle" class="serif text-xl mb-2 pr-10">Akun admin</h2><p class="text-xs leading-5 text-muted mb-5">Perbarui username dan password untuk mengamankan dashboard. Perubahan akan mengakhiri sesi admin yang sedang aktif.</p>
+      <form id="adminAccountForm" class="space-y-4">
+        <div><label class="field-label" for="newAdminUsername">Username baru</label><input id="newAdminUsername" class="field" maxlength="160" autocomplete="username" required></div>
+        <div><label class="field-label" for="newAdminPassword">Password baru</label><input id="newAdminPassword" type="password" class="field" maxlength="1024" autocomplete="new-password" required></div>
+        <div><label class="field-label" for="confirmAdminPassword">Ulangi password baru</label><input id="confirmAdminPassword" type="password" class="field" maxlength="1024" autocomplete="new-password" required></div>
+        <button class="btn-secondary icon-only w-full" type="submit" aria-label="Perbarui akun admin" title="Perbarui akun admin"><svg><use href="#icon-save"></use></svg></button>
+      </form>
+      <div class="mt-6 pt-5 border-t divider"><p class="text-xs text-muted leading-5">Password disimpan sebagai hash di server dan tidak dikirim kembali ke browser. Gunakan password yang kuat dan berbeda dari akun lain.</p></div>
+    </div>
+  </div>
+
+  <div id="loginModal" class="modal-backdrop" hidden>
+    <div class="panel modal-card p-6 sm:p-7 relative" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+      <button id="closeLoginBtn" class="modal-close absolute top-3 right-3" type="button" aria-label="Tutup" title="Tutup"><svg width="19" height="19"><use href="#icon-x"></use></svg></button>
+      <p class="eyebrow mb-2">Restricted access</p><h2 id="loginModalTitle" class="serif text-3xl">Masuk admin</h2><p class="text-xs text-muted mt-2 mb-6">Gunakan akun pengurus untuk mengelola kas tim.</p>
+      <form id="loginForm" class="space-y-4">
+        <div><label class="field-label" for="loginUsername">Username</label><input id="loginUsername" class="field" autocomplete="username" required></div>
+        <div><label class="field-label" for="loginPassword">Password</label><input id="loginPassword" type="password" class="field" autocomplete="current-password" required></div>
+        <button id="loginSubmitBtn" class="btn-primary icon-only w-full" type="submit" aria-label="Masuk dashboard" title="Masuk dashboard"><svg><use href="#icon-shield"></use></svg></button>
+      </form>
+      <p class="text-[10px] text-muted mt-5 leading-5">Akses admin dilindungi sesi server. Jangan bagikan kredensial kepada pihak yang tidak berwenang.</p>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal-backdrop" hidden>
+    <div class="panel modal-card p-5 sm:p-6" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <p class="eyebrow mb-2">Konfirmasi tindakan</p>
+      <h2 id="confirmTitle" class="serif text-2xl">Apakah Anda yakin?</h2>
+      <p id="confirmMessage" class="text-sm text-muted leading-6 mt-3"></p>
+      <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 mt-6">
+        <button id="confirmCancelBtn" class="btn-quiet icon-only" type="button" aria-label="Batal" title="Batal"><svg><use href="#icon-x"></use></svg></button>
+        <button id="confirmActionBtn" class="btn-primary icon-only" type="button" aria-label="Lanjutkan" title="Lanjutkan"><svg><use href="#icon-check"></use></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast panel px-4 py-3 text-sm" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    'use strict';
+
+    const gasUrl = "https://script.google.com/macros/s/AKfycbxPFeCXNFPgdiaxrWIbbSlh-ACQQgjtWbwMhdTHRuCHRdYl_fFnAOLoNLNG6NpviyDgQw/exec";
+    const STORAGE_MODE = "SERVER";
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+    const DEFAULT_CLIENT_DATA = {
+      version: 1,
+      settings: { siteName: 'Kas Manahan Pagi Basketball', tagline: 'Satu tim, satu tujuan, transparansi untuk semua.', openingBalance: 0, logoUrl: '', faviconUrl: '', paymentNote: 'Hubungi pengurus kas untuk informasi pembayaran iuran.', currency: 'IDR' },
+      categories: { income: ['Iuran anggota', 'Donasi', 'Sponsor', 'Lainnya'], expense: ['Sewa lapangan', 'Perlengkapan', 'Konsumsi', 'Transportasi', 'Lainnya'] },
+      transactions: [], members: [], updatedAt: ''
+    };
+
+    let appData = structuredCloneSafe(DEFAULT_CLIENT_DATA);
+    let adminToken = sessionStorage.getItem('mpb_admin_token') || '';
+    let activeAdminTab = 'overview';
+    let toastTimer = null;
+    let confirmResolver = null;
+
+    function structuredCloneSafe(value) { return JSON.parse(JSON.stringify(value)); }
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+    }
+    function iconSvg(name, size = 18) {
+      const allowed = ['shield','arrow-left','log-out','layout','receipt','users','settings','database','plus','pencil','trash','save','x','check','download','upload','refresh','user-plus','lock','arrow-down'];
+      const iconName = allowed.includes(name) ? name : 'check';
+      return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#icon-${iconName}"></use></svg>`;
+    }
+    function formatMoney(value) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(value) || 0);
+    }
+    function formatIntegerInput(value) {
+      const digits = String(value == null ? '' : value).replace(/\D/g, '').slice(0, 13);
+      return digits ? new Intl.NumberFormat('id-ID', { maximumFractionDigits:0 }).format(Number(digits)) : '';
+    }
+    function parseIntegerInput(value) {
+      const digits = String(value == null ? '' : value).replace(/\D/g, '');
+      return digits ? Number(digits) : NaN;
+    }
+    function formatIntegerField(input) {
+      const original = input.value;
+      const selection = input.selectionStart == null ? original.length : input.selectionStart;
+      const digitsBeforeCaret = original.slice(0, selection).replace(/\D/g, '').length;
+      const digits = original.replace(/\D/g, '').slice(0, 13);
+      const formatted = digits ? new Intl.NumberFormat('id-ID', { maximumFractionDigits:0 }).format(Number(digits)) : '';
+      input.value = formatted;
+      let caret = 0;
+      let digitCount = 0;
+      while (caret < formatted.length && digitCount < digitsBeforeCaret) {
+        if (/\d/.test(formatted.charAt(caret))) digitCount++;
+        caret++;
+      }
+      input.setSelectionRange(caret, caret);
+    }
+    function setIntegerField(input, value) {
+      const number = Number(value);
+      input.value = Number.isFinite(number) ? formatIntegerInput(Math.max(0, Math.trunc(number))) : '';
+    }
+    function formatDate(value) {
+      if (!value) return '—';
+      const parsed = new Date(String(value) + 'T00:00:00');
+      if (Number.isNaN(parsed.getTime())) return escapeHtml(value);
+      return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).format(parsed);
+    }
+    function todayLocal() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now.getTime() - offset).toISOString().slice(0, 10);
+    }
+    function newId() {
+      return (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : 'mpb-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+    }
+    function notify(message, kind = 'success') {
+      const toast = $('#toast');
+      toast.textContent = String(message == null ? '' : message);
+      const styles = {
+        success: { border:'#665638', color:'#E7D7B2' },
+        error: { border:'#75413A', color:'#F2BDB3' },
+        info: { border:'#494136', color:'#FAF7F0' }
+      };
+      const style = styles[kind] || styles.success;
+      toast.style.borderColor = style.border;
+      toast.style.color = style.color;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+    function setBusy(button, busy, label) {
+      if (!button) return;
+      if (busy) {
+        if (button.dataset.busy === 'true') return;
+        button.dataset.originalHtml = button.innerHTML;
+        button.dataset.wasDisabled = button.disabled ? 'true' : 'false';
+        button.dataset.originalAriaLabel = button.getAttribute('aria-label') || '';
+        button.dataset.originalTitle = button.getAttribute('title') || '';
+        button.dataset.busy = 'true';
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        button.setAttribute('aria-label', label || 'Memproses');
+        button.setAttribute('title', label || 'Memproses');
+        button.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>';
+      } else {
+        if (button.dataset.busy === 'true') {
+          button.innerHTML = button.dataset.originalHtml || '';
+          button.disabled = button.dataset.wasDisabled === 'true';
+          if (button.dataset.originalAriaLabel) button.setAttribute('aria-label', button.dataset.originalAriaLabel); else button.removeAttribute('aria-label');
+          if (button.dataset.originalTitle) button.setAttribute('title', button.dataset.originalTitle); else button.removeAttribute('title');
+          delete button.dataset.originalHtml;
+          delete button.dataset.wasDisabled;
+          delete button.dataset.originalAriaLabel;
+          delete button.dataset.originalTitle;
+          delete button.dataset.busy;
+        }
+        button.setAttribute('aria-busy', 'false');
+      }
+    }
+    function showConfirmPopup(options = {}) {
+      const modal = $('#confirmModal');
+      const actionButton = $('#confirmActionBtn');
+      $('#confirmTitle').textContent = options.title || 'Konfirmasi tindakan';
+      $('#confirmMessage').textContent = options.message || 'Lanjutkan tindakan ini?';
+      actionButton.setAttribute('aria-label', options.confirmLabel || 'Lanjutkan');
+      actionButton.setAttribute('title', options.confirmLabel || 'Lanjutkan');
+      actionButton.innerHTML = iconSvg(options.danger === true ? 'trash' : 'check');
+      actionButton.classList.toggle('btn-danger', options.danger === true);
+      actionButton.classList.toggle('btn-primary', options.danger !== true);
+      modal.hidden = false;
+      requestAnimationFrame(() => $('#confirmCancelBtn').focus());
+      return new Promise(resolve => { confirmResolver = resolve; });
+    }
+    function closeConfirmPopup(confirmed = false) {
+      $('#confirmModal').hidden = true;
+      if (confirmResolver) {
+        const resolve = confirmResolver;
+        confirmResolver = null;
+        resolve(confirmed);
+      }
+    }
+    function openEditorModal(id, focusSelector) {
+      const modal = $('#' + id);
+      if (!modal) return;
+      modal.hidden = false;
+      requestAnimationFrame(() => {
+        const target = focusSelector ? $(focusSelector, modal) : $('input:not([type="hidden"]), select, textarea, button', modal);
+        if (target) target.focus();
+      });
+    }
+    function closeEditorModal(id) {
+      const modal = $('#' + id);
+      if (modal) modal.hidden = true;
+    }
+    function closeAllEditorModals() {
+      ['transactionEditorModal','memberEditorModal','settingsEditorModal','accountEditorModal'].forEach(closeEditorModal);
+    }
+    function apiCall(action, payload = {}) {
+      if (STORAGE_MODE !== 'SERVER') return Promise.reject(new Error('Konfigurasi STORAGE_MODE harus SERVER.'));
+      const request = Object.assign({ action }, payload);
+      if (window.google && google.script && google.script.run) {
+        return new Promise((resolve, reject) => {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(error => reject(new Error(error && error.message ? error.message : 'Koneksi ke server gagal.')))
+            .apiRequest(request);
+        });
+      }
+      if (gasUrl && gasUrl !== 'GANTI_INI') {
+        return fetch(gasUrl, {
+          method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(request)
+        }).then(async response => {
+          const text = await response.text();
+          try { return JSON.parse(text); } catch (_) { throw new Error('Response server bukan JSON yang valid. Pastikan URL Web App benar.'); }
+        });
+      }
+      return Promise.reject(new Error('Halaman belum terhubung. Buka website dari URL Web App Google Apps Script atau isi gasUrl untuk hosting terpisah.'));
+    }
+    async function requireOk(action, payload = {}) {
+      const response = await apiCall(action, payload);
+      if (!response || response.ok !== true) throw new Error(response && response.error ? response.error : 'Server tidak mengonfirmasi perubahan.');
+      return response.data || {};
+    }
+
+    function totals(data = appData) {
+      const transactions = Array.isArray(data.transactions) ? data.transactions : [];
+      const month = todayLocal().slice(0, 7);
+      let income = 0, expense = 0, monthIncome = 0, monthExpense = 0;
+      transactions.forEach(item => {
+        const amount = Number(item.amount) || 0;
+        if (item.type === 'income') { income += amount; if (String(item.date).slice(0, 7) === month) monthIncome += amount; }
+        else if (item.type === 'expense') { expense += amount; if (String(item.date).slice(0, 7) === month) monthExpense += amount; }
+      });
+      return { income, expense, monthIncome, monthExpense, balance: (Number(data.settings?.openingBalance) || 0) + income - expense };
+    }
+    function sortedTransactions(list = appData.transactions) {
+      return [...(list || [])].sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    }
+    function applyBranding() {
+      const settings = appData.settings || DEFAULT_CLIENT_DATA.settings;
+      const name = settings.siteName || DEFAULT_CLIENT_DATA.settings.siteName;
+      $('#brandName').textContent = name;
+      $('#footerName').textContent = name;
+      document.title = name;
+      $('#publicTagline').textContent = settings.tagline || '';
+      $('#paymentNote').textContent = settings.paymentNote || '';
+      if (settings.logoUrl) {
+        $('#brandMark').innerHTML = `<img src="${escapeHtml(settings.logoUrl)}" alt="Logo" loading="eager" decoding="async" referrerpolicy="no-referrer">`;
+      } else {
+        $('#brandMark').innerHTML = '<svg viewBox="0 0 48 48" width="27" height="27" fill="none"><circle cx="24" cy="24" r="17" stroke="#C6A15B" stroke-width="2.5"/><path d="M7 24h34M24 7c-8 9-8 25 0 34M24 7c8 9 8 25 0 34" stroke="#C6A15B" stroke-width="2"/></svg>';
+      }
+      if (settings.faviconUrl) $('#appFavicon').href = settings.faviconUrl;
+    }
+
+    function normalizeSearch(value) {
+      return String(value == null ? '' : value).toLocaleLowerCase('id-ID').trim();
+    }
+    function transactionMatchesSearch(item, query, includePrivate = false) {
+      if (!query) return true;
+      const values = [
+        item.date,
+        formatDate(item.date),
+        item.description,
+        item.category,
+        item.type === 'income' ? 'pemasukan masuk income' : 'pengeluaran keluar expense',
+        item.amount,
+        formatMoney(item.amount)
+      ];
+      if (includePrivate) values.push(item.person, item.note);
+      return normalizeSearch(values.join(' ')).includes(query);
+    }
+    function filterTransactions(list, typeFilter, searchValue, includePrivate = false) {
+      const query = normalizeSearch(searchValue);
+      return list.filter(item => (typeFilter === 'all' || item.type === typeFilter) && transactionMatchesSearch(item, query, includePrivate));
+    }
+    function groupTransactionsByDate(list) {
+      const groups = [];
+      list.forEach(item => {
+        const date = String(item.date || '');
+        let group = groups[groups.length - 1];
+        if (!group || group.date !== date) {
+          group = { date, items: [] };
+          groups.push(group);
+        }
+        group.items.push(item);
+      });
+      return groups;
+    }
+    function transactionGroupHeading(date, items) {
+      let income = 0;
+      let expense = 0;
+      items.forEach(item => {
+        const amount = Number(item.amount) || 0;
+        if (item.type === 'income') income += amount;
+        else if (item.type === 'expense') expense += amount;
+      });
+      return `<div class="date-group-heading px-3 sm:px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div><strong class="block text-xs text-paper">${formatDate(date)}</strong><span class="text-[10px] text-muted">${items.length} transaksi</span></div>
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px]"><span class="text-[#A9D1AF]">Masuk ${formatMoney(income)}</span><span class="text-[#E2B1A6]">Keluar ${formatMoney(expense)}</span></div>
+      </div>`;
+    }
+    function renderPublicTransactionRow(item) {
+      const income = item.type === 'income';
+      return `<div class="transaction-row grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[1fr_1.2fr_1fr_1fr] gap-x-3 gap-y-1 py-4 border-b divider items-center">
+        <span class="transaction-date text-xs text-muted">${formatDate(item.date)}</span>
+        <span class="transaction-detail min-w-0"><strong class="block text-sm font-semibold break-words">${escapeHtml(item.description || item.category || 'Transaksi')}</strong><span class="text-[11px] text-muted">${escapeHtml(item.category || 'Lainnya')}</span></span>
+        <span class="transaction-kind text-[10px] uppercase tracking-wider font-bold ${income ? 'text-[#A9D1AF]' : 'text-[#E2B1A6]'}"><span class="sm:hidden">${income ? '↑ ' : '↓ '}</span>${income ? 'Pemasukan' : 'Pengeluaran'}</span>
+        <strong class="transaction-amount text-sm text-right money-number ${income ? 'text-[#A9D1AF]' : 'text-[#E2B1A6]'}">${income ? '+' : '−'}${formatMoney(item.amount)}</strong>
+      </div>`;
+    }
+    function renderPublic() {
+      applyBranding();
+      const summary = totals();
+      $('#publicBalance').textContent = formatMoney(summary.balance);
+      $('#publicMonthIncome').textContent = formatMoney(summary.monthIncome);
+      $('#publicMonthExpense').textContent = formatMoney(summary.monthExpense);
+      $('#publicIncomeTotal').textContent = formatMoney(summary.income);
+      $('#publicExpenseTotal').textContent = formatMoney(summary.expense);
+      const list = filterTransactions(sortedTransactions(), $('#publicFilter').value, $('#publicTransactionSearch').value, false);
+      const container = $('#publicTransactions');
+      const hasTransactions = list.length > 0;
+      $('#publicEmpty').classList.toggle('hidden-view', hasTransactions);
+      container.classList.toggle('hidden-view', !hasTransactions);
+      $('#publicTransactionCount').textContent = `${list.length} dari ${(appData.transactions || []).length} transaksi`;
+      if (!hasTransactions) {
+        const hasData = (appData.transactions || []).length > 0;
+        $('#publicEmptyTitle').textContent = hasData ? 'Transaksi tidak ditemukan' : 'Belum ada transaksi';
+        $('#publicEmptyDescription').textContent = hasData ? 'Coba ubah kata pencarian atau filter transaksi.' : 'Data transaksi akan tampil di sini setelah dicatat pengurus.';
+        container.innerHTML = '';
+      } else if ($('#publicGroupMode').value === 'date') {
+        container.innerHTML = groupTransactionsByDate(list).map(group => transactionGroupHeading(group.date, group.items) + group.items.map(renderPublicTransactionRow).join('')).join('');
+      } else {
+        container.innerHTML = list.map(renderPublicTransactionRow).join('');
+      }
+      $('#lastUpdated').textContent = appData.updatedAt ? 'Terakhir diperbarui: ' + new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(appData.updatedAt)) : 'Belum ada pembaruan data.';
+    }
+
+    function renderAdmin() {
+      const summary = totals();
+      $('#adminBalance').textContent = formatMoney(summary.balance);
+      $('#adminIncome').textContent = formatMoney(summary.income);
+      $('#adminExpense').textContent = formatMoney(summary.expense);
+      $('#adminMonthIncome').textContent = formatMoney(summary.monthIncome);
+      $('#adminMonthExpense').textContent = formatMoney(summary.monthExpense);
+      $('#adminTransactionCount').textContent = String(appData.transactions.length);
+      $('#adminUpdatedAt').textContent = appData.updatedAt ? 'Data server diperbarui: ' + new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(appData.updatedAt)) : '';
+      const recent = sortedTransactions().slice(0, 5);
+      $('#adminRecentTransactions').innerHTML = recent.length ? recent.map(transactionCompactRow).join('') : emptySmall('Belum ada transaksi tercatat.');
+      renderAdminTransactions();
+      renderMembers();
+      fillSettingsForm();
+      fillCategorySelect();
+    }
+    function transactionCompactRow(item) {
+      const income = item.type === 'income';
+      return `<div class="flex justify-between items-center gap-3 py-3 border-b divider last:border-0"><div class="min-w-0"><strong class="block text-sm truncate">${escapeHtml(item.description || item.category)}</strong><span class="text-[11px] text-muted">${formatDate(item.date)} · ${escapeHtml(item.category)}</span></div><strong class="text-xs whitespace-nowrap money-number ${income ? 'text-[#A9D1AF]' : 'text-[#E2B1A6]'}">${income ? '+' : '−'}${formatMoney(item.amount)}</strong></div>`;
+    }
+    function emptySmall(message) { return `<div class="py-8 text-center text-xs text-muted">${escapeHtml(message)}</div>`; }
+
+    function renderAdminTransactionRow(item) {
+      const income = item.type === 'income';
+      return `<div class="py-3 flex gap-3 items-start justify-between border-b divider">
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap gap-2 items-center"><strong class="text-sm">${escapeHtml(item.description || item.category)}</strong><span class="text-[9px] px-2 py-1 rounded-full ${income ? 'bg-[#26362A] text-[#A9D1AF]' : 'bg-[#3A2724] text-[#E2B1A6]'}">${income ? 'Masuk' : 'Keluar'}</span></div>
+          <p class="text-[11px] text-muted mt-1">${formatDate(item.date)} · ${escapeHtml(item.category)}${item.person ? ' · ' + escapeHtml(item.person) : ''}</p>
+          <p class="text-sm font-bold mt-2 money-number ${income ? 'text-[#A9D1AF]' : 'text-[#E2B1A6]'}">${income ? '+' : '−'}${formatMoney(item.amount)}</p>
+          ${item.note ? `<p class="text-[10px] text-muted mt-1">Catatan: ${escapeHtml(item.note)}</p>` : ''}
+        </div>
+        <div class="flex gap-1 shrink-0"><button class="btn-quiet icon-only !w-10 !min-w-10 !h-10 !min-h-10" type="button" data-edit-transaction="${escapeHtml(item.id)}" aria-label="Edit transaksi" title="Edit transaksi">${iconSvg('pencil',17)}</button><button class="btn-danger icon-only !w-10 !min-w-10 !h-10 !min-h-10" type="button" data-delete-transaction="${escapeHtml(item.id)}" aria-label="Hapus transaksi" title="Hapus transaksi">${iconSvg('trash',17)}</button></div>
+      </div>`;
+    }
+    function renderAdminTransactions() {
+      const filtered = filterTransactions(sortedTransactions(), $('#adminTransactionFilter').value, $('#adminTransactionSearch').value, true);
+      const allCount = (appData.transactions || []).length;
+      $('#adminLedgerTransactionCount').textContent = `${filtered.length} dari ${allCount} transaksi`;
+      const container = $('#adminTransactionList');
+      if (!filtered.length) {
+        const hasData = allCount > 0;
+        container.innerHTML = emptySmall(hasData ? 'Tidak ada transaksi yang cocok dengan pencarian atau filter.' : 'Belum ada transaksi tercatat.');
+      } else if ($('#adminTransactionGroupMode').value === 'date') {
+        container.innerHTML = groupTransactionsByDate(filtered).map(group => transactionGroupHeading(group.date, group.items) + group.items.map(renderAdminTransactionRow).join('')).join('');
+      } else {
+        container.innerHTML = filtered.map(renderAdminTransactionRow).join('');
+      }
+    }
+
+    function fillCategorySelect(selected) {
+      const type = $('#transactionType').value === 'expense' ? 'expense' : 'income';
+      const categories = appData.categories?.[type] || ['Lainnya'];
+      $('#transactionCategory').innerHTML = categories.map(item => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
+      if (selected && categories.includes(selected)) $('#transactionCategory').value = selected;
+    }
+    function resetTransactionForm() {
+      $('#transactionForm').reset();
+      $('#transactionId').value = '';
+      $('#transactionDate').value = todayLocal();
+      $('#transactionFormTitle').textContent = 'Tambah transaksi';
+      $('#saveTransactionBtn').setAttribute('aria-label', 'Simpan transaksi');
+      $('#saveTransactionBtn').setAttribute('title', 'Simpan transaksi');
+      $('#saveTransactionBtn').innerHTML = iconSvg('save');
+      $('#cancelEditBtn').classList.add('hidden-view');
+      closeEditorModal('transactionEditorModal');
+      fillCategorySelect();
+    }
+    function openNewTransaction() {
+      resetTransactionForm();
+      switchAdminTab('transactions');
+      openEditorModal('transactionEditorModal', '#transactionType');
+    }
+    function editTransaction(id) {
+      const item = appData.transactions.find(tx => tx.id === id);
+      if (!item) return;
+      $('#transactionId').value = item.id;
+      $('#transactionType').value = item.type;
+      fillCategorySelect(item.category);
+      $('#transactionDate').value = item.date;
+      setIntegerField($('#transactionAmount'), item.amount);
+      $('#transactionDescription').value = item.description || '';
+      $('#transactionPerson').value = item.person || '';
+      $('#transactionNote').value = item.note || '';
+      $('#transactionFormTitle').textContent = 'Edit transaksi';
+      $('#saveTransactionBtn').setAttribute('aria-label', 'Simpan perubahan transaksi');
+      $('#saveTransactionBtn').setAttribute('title', 'Simpan perubahan transaksi');
+      $('#saveTransactionBtn').innerHTML = iconSvg('save');
+      $('#cancelEditBtn').classList.remove('hidden-view');
+      openEditorModal('transactionEditorModal', '#transactionType');
+    }
+
+    function renderMembers() {
+      const list = [...(appData.members || [])].sort((a, b) => a.name.localeCompare(b.name, 'id'));
+      $('#memberList').innerHTML = list.length ? list.map(member => `<div class="py-3 flex items-start justify-between gap-3"><div class="min-w-0"><div class="flex items-center gap-2"><strong class="text-sm">${escapeHtml(member.name)}</strong><span class="dot ${member.active ? 'bg-[#7AAB83]' : 'bg-[#8C8478]'}"></span></div><p class="text-[11px] text-muted mt-1">${escapeHtml(member.role || 'Anggota')}${member.active ? '' : ' · Nonaktif'}</p>${member.note ? `<p class="text-[10px] text-muted mt-1">${escapeHtml(member.note)}</p>` : ''}</div><div class="flex gap-1 shrink-0"><button class="btn-quiet icon-only !w-10 !min-w-10 !h-10 !min-h-10" type="button" data-edit-member="${escapeHtml(member.id)}" aria-label="Edit anggota" title="Edit anggota">${iconSvg('pencil',17)}</button><button class="btn-danger icon-only !w-10 !min-w-10 !h-10 !min-h-10" type="button" data-delete-member="${escapeHtml(member.id)}" aria-label="Hapus anggota" title="Hapus anggota">${iconSvg('trash',17)}</button></div></div>`).join('') : emptySmall('Belum ada anggota.');
+    }
+    function resetMemberForm() {
+      $('#memberForm').reset();
+      $('#memberId').value = '';
+      $('#memberActive').checked = true;
+      $('#memberFormTitle').textContent = 'Tambah anggota';
+      $('#saveMemberBtn').setAttribute('aria-label', 'Simpan anggota');
+      $('#saveMemberBtn').setAttribute('title', 'Simpan anggota');
+      $('#saveMemberBtn').innerHTML = iconSvg('save');
+      $('#cancelMemberEditBtn').classList.add('hidden-view');
+      closeEditorModal('memberEditorModal');
+    }
+    function openNewMember() {
+      resetMemberForm();
+      openEditorModal('memberEditorModal', '#memberName');
+    }
+    function editMember(id) {
+      const member = appData.members.find(item => item.id === id);
+      if (!member) return;
+      $('#memberId').value = member.id;
+      $('#memberName').value = member.name || '';
+      $('#memberRole').value = member.role || '';
+      $('#memberNote').value = member.note || '';
+      $('#memberActive').checked = member.active !== false;
+      $('#memberFormTitle').textContent = 'Edit anggota';
+      $('#saveMemberBtn').setAttribute('aria-label', 'Simpan perubahan anggota');
+      $('#saveMemberBtn').setAttribute('title', 'Simpan perubahan anggota');
+      $('#saveMemberBtn').innerHTML = iconSvg('save');
+      $('#cancelMemberEditBtn').classList.remove('hidden-view');
+      openEditorModal('memberEditorModal', '#memberName');
+    }
+    function fillSettingsForm() {
+      const settings = appData.settings || DEFAULT_CLIENT_DATA.settings;
+      $('#settingSiteName').value = settings.siteName || '';
+      $('#settingTagline').value = settings.tagline || '';
+      setIntegerField($('#settingOpeningBalance'), settings.openingBalance);
+      $('#settingLogoUrl').value = settings.logoUrl || '';
+      $('#settingFaviconUrl').value = settings.faviconUrl || '';
+      $('#settingPaymentNote').value = settings.paymentNote || '';
+    }
+    async function saveDataCandidate(candidate, successMessage) {
+      const result = await requireOk('saveData', { token: adminToken, data: candidate });
+      appData = result;
+      renderPublic();
+      renderAdmin();
+      notify(successMessage || 'Data berhasil disimpan di server.');
+      return result;
+    }
+    function showAdmin() {
+      $('#publicView').classList.add('hidden-view');
+      $('#adminView').classList.remove('hidden-view');
+      $('#openLoginBtn').classList.add('hidden-view');
+      $('#loginModal').hidden = true;
+      switchAdminTab('overview');
+      renderAdmin();
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+    function showPublic() {
+      closeAllEditorModals();
+      $('#adminView').classList.add('hidden-view');
+      $('#publicView').classList.remove('hidden-view');
+      $('#openLoginBtn').classList.remove('hidden-view');
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+    function switchAdminTab(tab) {
+      activeAdminTab = tab;
+      $$('.nav-tab').forEach(button => button.classList.toggle('active', button.dataset.adminTab === tab));
+      const map = { overview:'adminOverview', transactions:'adminTransactions', members:'adminMembers', settings:'adminSettings', backup:'adminBackup' };
+      Object.entries(map).forEach(([key, id]) => $('#' + id).classList.toggle('hidden-view', key !== tab));
+      if (tab === 'transactions') renderAdminTransactions();
+      if (tab === 'members') renderMembers();
+    }
+
+    async function loadPublicData() {
+      try {
+        const data = await requireOk('getData');
+        appData = Object.assign(structuredCloneSafe(DEFAULT_CLIENT_DATA), data);
+        renderPublic();
+      } catch (error) {
+        $('#publicTransactions').innerHTML = `<div class="py-8 text-center text-sm text-[#E2B1A6]">${escapeHtml(error.message)}</div>`;
+        $('#publicBalance').textContent = 'Tidak tersedia';
+        $('#lastUpdated').textContent = 'Koneksi server belum tersedia.';
+        notify('Gagal memuat data: ' + error.message, 'error');
+      }
+    }
+    async function tryRestoreAdminSession() {
+      if (!adminToken) return;
+      try {
+        const data = await requireOk('getData', { token:adminToken });
+        appData = Object.assign(structuredCloneSafe(DEFAULT_CLIENT_DATA), data);
+        showAdmin();
+      } catch (_) {
+        adminToken = '';
+        sessionStorage.removeItem('mpb_admin_token');
+      }
+    }
+
+    $('#publicFilter').addEventListener('change', renderPublic);
+    $('#publicTransactionSearch').addEventListener('input', renderPublic);
+    $('#publicGroupMode').addEventListener('change', renderPublic);
+    $('#openLoginBtn').addEventListener('click', () => { $('#loginModal').hidden = false; requestAnimationFrame(() => $('#loginUsername').focus()); });
+    $('#closeLoginBtn').addEventListener('click', () => { $('#loginModal').hidden = true; });
+    $('#loginModal').addEventListener('click', event => { if (event.target === $('#loginModal')) $('#loginModal').hidden = true; });
+    $('#confirmCancelBtn').addEventListener('click', () => closeConfirmPopup(false));
+    $('#confirmActionBtn').addEventListener('click', () => closeConfirmPopup(true));
+    $('#confirmModal').addEventListener('click', event => { if (event.target === $('#confirmModal')) closeConfirmPopup(false); });
+    const editorModalIds = ['transactionEditorModal','memberEditorModal','settingsEditorModal','accountEditorModal'];
+    editorModalIds.forEach(id => {
+      $('#' + id).addEventListener('click', event => { if (event.target === $('#' + id)) closeEditorModal(id); });
+    });
+    $('#closeTransactionModalBtn').addEventListener('click', () => closeEditorModal('transactionEditorModal'));
+    $('#closeMemberModalBtn').addEventListener('click', () => closeEditorModal('memberEditorModal'));
+    $('#closeSettingsModalBtn').addEventListener('click', () => closeEditorModal('settingsEditorModal'));
+    $('#closeAccountModalBtn').addEventListener('click', () => closeEditorModal('accountEditorModal'));
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      if (!$('#confirmModal').hidden) closeConfirmPopup(false);
+      else if (!$('#loginModal').hidden) $('#loginModal').hidden = true;
+      else {
+        const openEditor = editorModalIds.find(id => !$('#' + id).hidden);
+        if (openEditor) closeEditorModal(openEditor);
+      }
+    });
+
+    $('#loginForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = $('#loginSubmitBtn');
+      setBusy(button, true, 'Memeriksa…');
+      try {
+        const result = await requireOk('login', { username:$('#loginUsername').value, password:$('#loginPassword').value });
+        adminToken = result.token;
+        sessionStorage.setItem('mpb_admin_token', adminToken);
+        const data = await requireOk('getData', { token:adminToken });
+        appData = Object.assign(structuredCloneSafe(DEFAULT_CLIENT_DATA), data);
+        $('#loginForm').reset();
+        showAdmin();
+        notify('Berhasil masuk sebagai admin.');
+      } catch (error) {
+        notify(error.message, 'error');
+      } finally { setBusy(button, false); }
+    });
+
+    $('#backPublicBtn').addEventListener('click', showPublic);
+    $('#logoutBtn').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      setBusy(button, true, 'Keluar…');
+      try { await requireOk('logout', { token:adminToken }); } catch (_) {}
+      adminToken = '';
+      sessionStorage.removeItem('mpb_admin_token');
+      showPublic();
+      notify('Anda telah keluar.');
+      setBusy(button, false);
+    });
+    $$('.nav-tab').forEach(button => button.addEventListener('click', () => switchAdminTab(button.dataset.adminTab)));
+    $$('[data-go-tab]').forEach(button => button.addEventListener('click', () => switchAdminTab(button.dataset.goTab)));
+    $('#quickAddTransactionBtn').addEventListener('click', openNewTransaction);
+    $('#openTransactionModalBtn').addEventListener('click', openNewTransaction);
+    $('#openMemberModalBtn').addEventListener('click', openNewMember);
+    $('#openSettingsModalBtn').addEventListener('click', () => { fillSettingsForm(); openEditorModal('settingsEditorModal', '#settingSiteName'); });
+    $('#openAccountModalBtn').addEventListener('click', () => { $('#adminAccountForm').reset(); openEditorModal('accountEditorModal', '#newAdminUsername'); });
+    $('#transactionType').addEventListener('change', () => fillCategorySelect());
+    $('#transactionAmount').addEventListener('input', event => formatIntegerField(event.currentTarget));
+    $('#settingOpeningBalance').addEventListener('input', event => formatIntegerField(event.currentTarget));
+    $('#adminTransactionFilter').addEventListener('change', renderAdminTransactions);
+    $('#adminTransactionSearch').addEventListener('input', renderAdminTransactions);
+    $('#adminTransactionGroupMode').addEventListener('change', renderAdminTransactions);
+    $('#cancelEditBtn').addEventListener('click', resetTransactionForm);
+    $('#cancelMemberEditBtn').addEventListener('click', resetMemberForm);
+
+    $('#transactionForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = $('#saveTransactionBtn');
+      setBusy(button, true, 'Menyimpan…');
+      try {
+        const id = $('#transactionId').value;
+        const item = {
+          id:id || newId(), type:$('#transactionType').value, date:$('#transactionDate').value,
+          amount:parseIntegerInput($('#transactionAmount').value), category:$('#transactionCategory').value,
+          description:$('#transactionDescription').value.trim(), person:$('#transactionPerson').value.trim(),
+          note:$('#transactionNote').value.trim(), createdAt:id ? (appData.transactions.find(tx => tx.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString()
+        };
+        if (!item.description) throw new Error('Keterangan transaksi wajib diisi.');
+        if (!Number.isSafeInteger(item.amount) || item.amount <= 0 || item.amount > 1000000000000) throw new Error('Nominal harus lebih dari nol dan maksimal Rp1.000.000.000.000.');
+        const next = structuredCloneSafe(appData);
+        const existingIndex = next.transactions.findIndex(tx => tx.id === id);
+        if (existingIndex >= 0) next.transactions[existingIndex] = item; else next.transactions.push(item);
+        await saveDataCandidate(next, id ? 'Perubahan transaksi tersimpan.' : 'Transaksi baru tersimpan.');
+        resetTransactionForm();
+      } catch (error) { notify(error.message, 'error'); }
+      finally {
+        setBusy(button, false);
+        if (!$('#transactionId').value) {
+          button.innerHTML = iconSvg('save');
+          button.setAttribute('aria-label', 'Simpan transaksi');
+          button.setAttribute('title', 'Simpan transaksi');
+        }
+      }
+    });
+
+    $('#adminTransactionList').addEventListener('click', async event => {
+      const editButton = event.target.closest('[data-edit-transaction]');
+      const deleteButton = event.target.closest('[data-delete-transaction]');
+      if (editButton) editTransaction(editButton.dataset.editTransaction);
+      if (deleteButton) {
+        const id = deleteButton.dataset.deleteTransaction;
+        const confirmed = await showConfirmPopup({ title:'Hapus transaksi?', message:'Hapus transaksi ini? Aksi ini tidak dapat dibatalkan.', confirmLabel:'Hapus transaksi', danger:true });
+        if (!confirmed) return;
+        setBusy(deleteButton, true, 'Menghapus…');
+        const next = structuredCloneSafe(appData);
+        next.transactions = next.transactions.filter(item => item.id !== id);
+        try { await saveDataCandidate(next, 'Transaksi berhasil dihapus.'); }
+        catch (error) { notify(error.message, 'error'); }
+        finally { setBusy(deleteButton, false); }
+      }
+    });
+
+    $('#memberForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = event.submitter || $('#saveMemberBtn');
+      setBusy(button, true, 'Menyimpan…');
+      try {
+        const id = $('#memberId').value;
+        const member = { id:id || newId(), name:$('#memberName').value.trim(), role:$('#memberRole').value.trim(), note:$('#memberNote').value.trim(), active:$('#memberActive').checked };
+        if (!member.name) throw new Error('Nama anggota wajib diisi.');
+        const next = structuredCloneSafe(appData);
+        const index = next.members.findIndex(item => item.id === id);
+        if (index >= 0) next.members[index] = member; else next.members.push(member);
+        await saveDataCandidate(next, id ? 'Data anggota diperbarui.' : 'Anggota berhasil ditambahkan.');
+        resetMemberForm();
+      } catch (error) { notify(error.message, 'error'); }
+      finally { setBusy(button, false); }
+    });
+    $('#memberList').addEventListener('click', async event => {
+      const editButton = event.target.closest('[data-edit-member]');
+      const deleteButton = event.target.closest('[data-delete-member]');
+      if (editButton) editMember(editButton.dataset.editMember);
+      if (deleteButton) {
+        const id = deleteButton.dataset.deleteMember;
+        const confirmed = await showConfirmPopup({ title:'Hapus anggota?', message:'Hapus anggota ini dari daftar?', confirmLabel:'Hapus anggota', danger:true });
+        if (!confirmed) return;
+        setBusy(deleteButton, true, 'Menghapus…');
+        const next = structuredCloneSafe(appData);
+        next.members = next.members.filter(item => item.id !== id);
+        try { await saveDataCandidate(next, 'Anggota berhasil dihapus.'); }
+        catch (error) { notify(error.message, 'error'); }
+        finally { setBusy(deleteButton, false); }
+      }
+    });
+
+    $('#settingsForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = $('#saveSettingsBtn');
+      setBusy(button, true, 'Menyimpan…');
+      try {
+        const openingBalance = parseIntegerInput($('#settingOpeningBalance').value);
+        if (!Number.isSafeInteger(openingBalance) || openingBalance < 0 || openingBalance > 1000000000000) throw new Error('Saldo awal harus antara Rp0 dan Rp1.000.000.000.000.');
+        const next = structuredCloneSafe(appData);
+        next.settings = Object.assign({}, next.settings, {
+          siteName:$('#settingSiteName').value.trim(), tagline:$('#settingTagline').value.trim(),
+          openingBalance, logoUrl:$('#settingLogoUrl').value.trim(),
+          faviconUrl:$('#settingFaviconUrl').value.trim(), paymentNote:$('#settingPaymentNote').value.trim(), currency:'IDR'
+        });
+        if (!next.settings.siteName) throw new Error('Nama website wajib diisi.');
+        for (const key of ['logoUrl', 'faviconUrl']) {
+          const value = next.settings[key];
+          if (value && !/^https?:\/\//i.test(value)) throw new Error('URL logo dan favicon harus menggunakan http:// atau https://.');
+        }
+        await saveDataCandidate(next, 'Pengaturan website berhasil disimpan.');
+        closeEditorModal('settingsEditorModal');
+      } catch (error) { notify(error.message, 'error'); }
+      finally { setBusy(button, false); }
+    });
+
+    $('#adminAccountForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const username = $('#newAdminUsername').value.trim();
+      const password = $('#newAdminPassword').value;
+      const confirmPassword = $('#confirmAdminPassword').value;
+      const submit = $('button[type="submit"]', $('#adminAccountForm'));
+      if (!username || !password) return notify('Username dan password baru wajib diisi.', 'error');
+      if (password !== confirmPassword) return notify('Konfirmasi password tidak sama.', 'error');
+      setBusy(submit, true, 'Memperbarui…');
+      try {
+        await requireOk('updateAdmin', { token:adminToken, username, password });
+        adminToken = '';
+        sessionStorage.removeItem('mpb_admin_token');
+        $('#adminAccountForm').reset();
+        closeEditorModal('accountEditorModal');
+        showPublic();
+        notify('Akun diperbarui. Silakan login kembali.');
+        $('#loginModal').hidden = false;
+        requestAnimationFrame(() => $('#loginUsername').focus());
+      } catch (error) { notify(error.message, 'error'); }
+      finally { setBusy(submit, false); }
+    });
+
+    $('#downloadBackupBtn').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      setBusy(button, true, 'Menyiapkan backup…');
+      try {
+        const result = await requireOk('backupData', { token:adminToken });
+        const blob = new Blob([JSON.stringify(result.backup, null, 2)], { type:'application/json' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = 'backup-kas-manahan-pagi-' + todayLocal() + '.json';
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+        notify('Backup berhasil dibuat.');
+      } catch (error) { notify(error.message, 'error'); }
+      finally { setBusy(button, false); }
+    });
+    $('#restoreBackupBtn').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      const file = $('#restoreFile').files[0];
+      if (!file) return notify('Pilih file backup JSON terlebih dahulu.', 'error');
+      if (file.size > 5 * 1024 * 1024) return notify('Ukuran file backup maksimal 5 MB.', 'error');
+      const confirmed = await showConfirmPopup({ title:'Pulihkan backup?', message:'Restore akan menggantikan data kas saat ini. Pastikan Anda memiliki backup terbaru sebelum melanjutkan.', confirmLabel:'Pulihkan data', danger:true });
+      if (!confirmed) return;
+      setBusy(button, true, 'Memulihkan…');
+      try {
+        const fileText = await file.text();
+        const backup = JSON.parse(fileText);
+        const data = await requireOk('restoreData', { token:adminToken, backup });
+        appData = data;
+        renderPublic();
+        renderAdmin();
+        $('#restoreFile').value = '';
+        notify('Data backup berhasil dipulihkan.');
+      } catch (error) { notify('Restore gagal: ' + error.message, 'error'); }
+      finally { setBusy(button, false); }
+    });
+    $('#resetDataBtn').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      const confirmed = await showConfirmPopup({ title:'Reset seluruh data kas?', message:'PERINGATAN: semua transaksi, anggota, dan pengaturan kustom akan dihapus. Pastikan Anda sudah mengunduh backup. Kredensial admin tidak ikut direset.', confirmLabel:'Ya, reset seluruh data', danger:true });
+      if (!confirmed) return;
+      setBusy(button, true, 'Mereset data…');
+      try {
+        const data = await requireOk('resetData', { token:adminToken });
+        appData = data;
+        renderPublic();
+        renderAdmin();
+        resetTransactionForm();
+        resetMemberForm();
+        notify('Data berhasil direset ke kondisi awal.');
+      } catch (error) { notify(error.message, 'error'); }
+      finally { setBusy(button, false); }
+    });
+
+    (async function init() {
+      await loadPublicData();
+      await tryRestoreAdminSession();
+    })();
+  </script>
+</body>
+</html>
